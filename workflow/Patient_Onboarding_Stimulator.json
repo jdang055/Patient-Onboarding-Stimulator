@@ -1,0 +1,195 @@
+{
+  "name": "Patient_Onboarding_Stimulator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0137646f-139b-4d5b-af99-3d2d360857b2",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e645883d-7da4-4497-b5f3-ad88fa844e7c",
+              "name": "scenario",
+              "value": "baseline",
+              "type": "string"
+            },
+            {
+              "id": "1c25d508-f4ae-4d22-acd4-66c924264d5a",
+              "name": "cases",
+              "value": "30",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0ed48d02-31d3-4467-9ca5-e0c62386b8fd",
+      "name": "Config"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "28af7143-80b8-4629-b1b7-a0ff627ab223",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "const cases = $json.cases;\n\nfunction uuidv4() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {\n    const r = Math.random() * 16 | 0;\n    const v = c === 'x' ? r : (r & 0x3 | 0x8);\n    return v.toString(16);\n  });\n}\n\nreturn Array.from({ length: cases }, () => ({\n  json: {\n    case_id: uuidv4(),\n    scenario: \"baseline\"\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "a8114c92-4282-43e3-b3ab-eeb2c94cd1e2",
+      "name": "Generate Cases"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO public.workflow_events\n  (case_id, step_name, event_type, actor, scenario_type, created_at)\nVALUES\n  ($1::uuid, 'INTAKE_SUBMITTED', 'COMPLETE', 'patient',  'optimized', NOW()),\n\n  ($1::uuid, 'OPS_REVIEW',       'START',    'ops',      'optimized', NOW() + interval '15 minutes'),\n  ($1::uuid, 'OPS_REVIEW',       'COMPLETE', 'ops',      'optimized', NOW() + interval '25 minutes'),\n\n  ($1::uuid, 'PROVIDER_REVIEW',  'START',    'provider', 'optimized', NOW() + interval '40 minutes'),\n  ($1::uuid, 'PROVIDER_REVIEW',  'COMPLETE', 'provider', 'optimized', NOW() + interval '50 minutes')\nRETURNING *;\n\n",
+        "options": {
+          "queryReplacement": "={{ $json.case_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        880,
+        16
+      ],
+      "id": "f8abd039-c5f5-4232-9499-d49a732d28c7",
+      "name": "Insert workflow events",
+      "credentials": {
+        "postgres": {
+          "id": "wYmHCpxz2XLMpiis",
+          "name": "Patient Onboarding"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🟨 Workflow Overview\n\nThis workflow simulates a clinical patient onboarding process using\nevent-level data to evaluate operational efficiency and identify\nbottlenecks.\n\nEach case represents a single patient onboarding journey with the\nfollowing fixed steps:\n\n- Intake submission  \n- Ops review (manual)  \n- Provider review  \n- Completion  \n\nWorkflow events are written to a Postgres database with realistic\ntimestamps. These timestamps enable downstream SQL analysis of\ncycle time and step-level delays.\n\nTwo scenarios are supported:\n- **Baseline:** manual ops review with queue delays  \n- **Optimized:** reduced manual handling to improve throughput  \n\nThis approach mirrors real-world clinical operations monitoring systems.\n",
+        "height": 512,
+        "width": 528
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -560
+      ],
+      "id": "2f14926b-f4cf-4147-8cde-efb57e420ec9",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## How to Run This Workflow\n\n1. Click **Execute workflow** (manual trigger)\n2. The workflow generates multiple onboarding cases\n3. Each case is processed sequentially using a loop\n4. Workflow events are inserted into the `workflow_events` table\n5. Run both baseline and optimized workflows separately\n\nAfter execution:\n- Compare baseline vs optimized cycle times using SQL\n- Identify operational bottlenecks by analyzing step durations\n\nNo UI, authentication, or external integrations are required.\n",
+        "height": 384,
+        "width": 416,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        576,
+        -480
+      ],
+      "id": "c720806f-90a7-4fbb-bfb0-c471ac084b4a",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Generate Cases",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Insert workflow events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Cases": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert workflow events": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3ef19919-349c-422f-a355-9b8c72f38a65",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9f65d1de108209ec46a801cb48812b1a1fe754417a806dbffe1a74da62df9826"
+  },
+  "id": "vtE4FKWp8wSu1HAz",
+  "tags": []
+}
