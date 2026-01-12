@@ -4,6 +4,8 @@ This project simulates a clinical patient onboarding workflow using event-level
 data to identify operational bottlenecks and measure the impact of workflow
 optimization.
 
+![Issue Routing Architecture](workflow/workflow_image.png)
+
 ## Workflow Modeled
 - Intake submitted
 - Ops review (manual)
