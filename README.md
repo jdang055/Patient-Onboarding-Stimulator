@@ -1,4 +1,4 @@
-# Clinical Workflow Optimization Simulator – Patient Onboarding
+# Clinical Workflow Optimization Simulator – Patient Onboarding 🩺🩺🩺
 
 This project simulates a clinical patient onboarding workflow using event-level
 data to identify operational bottlenecks and measure the impact of workflow
