@@ -50,7 +50,7 @@ impact on patient onboarding efficiency.
 - **Data storage:** Supabase (Postgres)  
 - **Analysis:** SQL (cycle time & bottleneck queries)
 
-- ## How to Run
+ ## How to Run
 
 1. Import the baseline or optimized workflow JSON into n8n
 2. Click **Execute workflow** (manual trigger)
