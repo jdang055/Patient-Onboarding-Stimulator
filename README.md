@@ -6,28 +6,56 @@ optimization.
 
 ![Issue Routing Architecture](workflow/workflow_image.png)
 
-## Workflow Modeled
-- Intake submitted
-- Ops review (manual)
-- Provider review
-- Completion
+The goal is to demonstrate how clinical operations teams can use workflow
+telemetry to measure cycle time, detect inefficiencies, and validate
+improvements before deploying changes to production systems.
 
-Two scenarios were simulated:
+---
+
+## Workflow Modeled
+
+Each case represents a single patient onboarding journey with the following
+fixed steps:
+
+1. Intake submitted  
+2. Ops review (manual)  
+3. Provider review  
+4. Completion  
+
+Two scenarios are simulated:
+
 - **Baseline:** manual ops review with queue delays
-- **Optimized:** automated triage and reduced manual handling
+- **Optimized:** reduced manual handling and faster handoffs
+
+Workflow events are written to a Postgres database with realistic timestamps,
+enabling cycle time and step-level bottleneck analysis.
+
+---
 
 ## Key Findings
+
 - Ops review was the primary bottleneck in the baseline workflow
-- Average ops review time decreased by ~33% after optimization
-- End-to-end onboarding cycle time improved by ~11–15%
-- Automation reduced manual queue delays and improved throughput
+- Average ops review time decreased by approximately **33%** after optimization
+- End-to-end onboarding cycle time improved by approximately **11–15%**
+- Automation reduced manual queue delays and improved overall throughput
 
-## Tech Stack
-- n8n (workflow simulation)
-- Supabase Postgres (event storage)
-- SQL (cycle time & bottleneck analysis)
+These results demonstrate how small operational changes can have measurable
+impact on patient onboarding efficiency.
 
-## Why This Matters
-This project demonstrates how event-driven data and SQL analysis can be used
-to identify inefficiencies in clinical operations and evaluate workflow
-improvements before production changes are made.
+---
+
+## Architecture
+
+- **Workflow orchestration:** n8n  
+- **Data storage:** Supabase (Postgres)  
+- **Analysis:** SQL (cycle time & bottleneck queries)
+
+- ## How to Run
+
+1. Import the baseline or optimized workflow JSON into n8n
+2. Click **Execute workflow** (manual trigger)
+3. The workflow generates multiple onboarding cases
+4. Events are inserted into the `workflow_events` table
+5. Run the provided SQL queries to analyze results
+
+No UI, authentication, or external integrations are required.
